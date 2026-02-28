@@ -105,6 +105,15 @@ def analytics():
         return jsonify({"error": "Failed to fetch analytics", "details": str(e)}), 500
 
 
+@api_bp.route("/analytics/trends", methods=["GET"])
+def analytics_trends():
+    try:
+        category = request.args.get("category")
+        return jsonify(trace_service.analytics_trends(category=category))
+    except Exception as e:
+        return jsonify({"error": "Failed to fetch trend analytics", "details": str(e)}), 500
+
+
 # ---------------- GLOBAL ERROR HANDLER ----------------
 
 @api_bp.errorhandler(404)

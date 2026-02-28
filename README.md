@@ -18,3 +18,4 @@ http://localhost:5000
 POST /traces
 GET /traces
 GET /analytics
+GET /analytics/trends

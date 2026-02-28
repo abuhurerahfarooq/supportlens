@@ -1,6 +1,7 @@
 from app.repositories.trace_repository import TraceRepository
 from app.models.trace import Trace
 from app.services.classification_service import ClassificationService
+from collections import defaultdict
 
 VALID_CATEGORIES = [
     "Billing",
@@ -56,4 +57,33 @@ class TraceService:
             "total_traces": total,
             "average_response_time_ms": avg,
             "breakdown": breakdown
+        }
+
+    def analytics_trends(self, category=None):
+        traces = self.repo.get_all_raw()
+
+        if category:
+            traces = [t for t in traces if t.category == category]
+
+        buckets = defaultdict(list)
+        for trace in traces:
+            day = trace.timestamp.strftime("%Y-%m-%d")
+            buckets[day].append(trace)
+
+        points = []
+        for day in sorted(buckets.keys()):
+            day_traces = buckets[day]
+            avg_response = round(
+                sum(t.response_time_ms for t in day_traces) / len(day_traces), 2
+            ) if day_traces else 0
+            points.append({
+                "date": day,
+                "count": len(day_traces),
+                "average_response_time_ms": avg_response
+            })
+
+        return {
+            "category": category or "All",
+            "total_points": len(points),
+            "points": points
         }
