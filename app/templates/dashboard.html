@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>SupportLens Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+</head>
+
+<body>
+
+    <header class="app-header">
+        <div class="header-content">
+            <p class="header-kicker">Support Operations</p>
+            <h1>SupportLens Observability Dashboard</h1>
+            <p class="header-subtitle">Track categories, response times, and live support quality in one view.</p>
+        </div>
+    </header>
+
+    <div class="layout">
+
+        <!-- MAIN DASHBOARD -->
+        <div class="main-content">
+
+            <!-- Category Breakdown -->
+            <div class="category-breakdown" id="categoryBreakdown">
+                <!-- Dynamic category cards -->
+            </div>
+
+            <!-- Filter -->
+            <div class="filter-section">
+                <label>Category:</label>
+                <div class="custom-dropdown" id="categoryDropdown">
+                    <div class="selected">All</div>
+                    <div class="options">
+                        <div data-value="">All</div>
+                        <div data-value="Billing">Billing</div>
+                        <div data-value="Refund">Refund</div>
+                        <div data-value="Account Access">Account Access</div>
+                        <div data-value="Cancellation">Cancellation</div>
+                        <div data-value="General Inquiry">General Inquiry</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Traces Table -->
+            <h2>Traces</h2>
+            <table id="traces">
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>User</th>
+                        <th>Bot</th>
+                        <th>Category</th>
+                        <th>Response Time</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+        </div>
+
+    </div>
+
+    <!-- FLOATING CHAT -->
+    <div class="chat-panel hidden" id="chatPanel">
+        <div class="chat-header">
+            <h2>Live Chat</h2>
+            <button id="closeChatBtn">&times;</button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="chat-info">
+                <strong>Before you send:</strong>
+                <p>Describe your issue clearly please.</p>
+            </div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="chatInput" placeholder="Type a message...">
+            <button id="sendBtn">Send</button>
+        </div>
+    </div>
+
+    <button id="openChatBtn" class="floating-btn">Chat</button>
+
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+
+</body>
+
+</html>
