@@ -1,6 +1,8 @@
 let traces = [];
 let selectedCategory = "";
 
+const API_BASE = "/api";
+
 // Chat toggle
 const chatPanel = document.getElementById('chatPanel');
 const closeBtn = document.getElementById('closeChatBtn');
@@ -39,7 +41,7 @@ async function sendMessage() {
     input.value = "";
 
     try {
-        const chatRes = await fetch("/chat", {
+        const chatRes = await fetch(`${API_BASE}/chat`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ message })
@@ -48,7 +50,7 @@ async function sendMessage() {
         const chatData = await chatRes.json();
         appendChat("Bot", chatData.bot_response);
 
-        const traceRes = await fetch("/traces", {
+        const traceRes = await fetch(`${API_BASE}/traces`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -100,7 +102,7 @@ function appendChat(sender, text) {
 // =============================
 async function loadTraces(category = "") {
     try {
-        let url = "/traces";
+        let url = `${API_BASE}/traces`;
         if (category) url += "?category=" + encodeURIComponent(category);
 
         const res = await fetch(url);
@@ -130,8 +132,7 @@ function renderTable() {
     const tbody = document.querySelector("#traces tbody");
     tbody.innerHTML = "";
 
-    traces.forEach((t, index) => {
-
+    traces.forEach((t) => {
         const safeClass = formatCategoryClass(t.category);
 
         const row = document.createElement("tr");
@@ -201,7 +202,7 @@ async function renderCategoryBreakdown(activeCategory = "") {
     const container = document.getElementById("categoryBreakdown");
 
     try {
-        const res = await fetch("/analytics");
+        const res = await fetch(`${API_BASE}/analytics`);
         const data = await res.json();
 
         container.innerHTML = "";

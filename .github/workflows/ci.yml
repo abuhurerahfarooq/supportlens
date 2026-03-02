@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - name: Install dependencies
+        run: pip install -r requirements.txt pytest ruff
+      - name: Static checks
+        run: ruff check --select E9,F63,F7,F82 app tests run.py
+      - name: Compile check
+        run: python -m compileall app run.py
+      - name: Unit tests
+        run: pytest -q
+
+  docker-build:
+    needs: quality
+    runs-on: ubuntu-latest
+    env:
+      OPENAI_API_KEY: ""
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create CI env file
+        run: printf "OPENAI_API_KEY=%s\n" "$OPENAI_API_KEY" > .env
+      - name: Build Docker images
+        run: docker compose build --parallel
+
+  e2e:
+    needs: docker-build
+    runs-on: ubuntu-latest
+    env:
+      OPENAI_API_KEY: ""
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create CI env file
+        run: printf "OPENAI_API_KEY=%s\n" "$OPENAI_API_KEY" > .env
+      - name: Start services
+        run: docker compose up -d --build
+      - name: Run E2E checks
+        run: bash scripts/ci/e2e.sh
+      - name: Dump diagnostics on failure
+        if: failure()
+        run: |
+          docker compose ps
+          docker compose logs --no-color
+      - name: Teardown
+        if: always()
+        run: docker compose down -v

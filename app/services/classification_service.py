@@ -1,5 +1,8 @@
-from app.llm.openai_client import OpenAILLM
+import logging
 import time
+
+from app.core.logging import log_event
+from app.llm.openai_client import OpenAILLM
 
 VALID_CATEGORIES = [
     "Billing",
@@ -35,9 +38,9 @@ Output:
 """
 
 class ClassificationService:
-
     def __init__(self):
         self.llm = OpenAILLM()
+        self.logger = logging.getLogger("supportlens.classification")
 
     def classify(self, user_message: str, bot_response: str) -> str:
         combined = f"""
@@ -49,10 +52,45 @@ class ClassificationService:
             """
         start = time.time()
 
-        category = self.llm.chat(CLASSIFICATION_PROMPT, combined)
+        try:
+            category = self.llm.chat(CLASSIFICATION_PROMPT, combined)
+        except Exception as exc:
+            fallback = self._heuristic_category(user_message)
+            log_event(
+                self.logger,
+                logging.WARNING,
+                "llm_classification_failed",
+                error=str(exc),
+                fallback_category=fallback,
+                message_preview=user_message[:120],
+            )
+            return fallback, int((time.time() - start) * 1000)
 
         if category not in VALID_CATEGORIES:
-            return "General Inquiry"
-        
+            fallback = self._heuristic_category(user_message)
+            log_event(
+                self.logger,
+                logging.WARNING,
+                "llm_unexpected_classification",
+                raw_category=category,
+                fallback_category=fallback,
+                message_preview=user_message[:120],
+            )
+            return fallback, int((time.time() - start) * 1000)
+
         response_time = int((time.time() - start) * 1000)
         return category, response_time
+
+    @staticmethod
+    def _heuristic_category(user_message: str) -> str:
+        text = user_message.lower()
+
+        if any(token in text for token in ["refund", "money back", "credit", "disputed charge"]):
+            return "Refund"
+        if any(token in text for token in ["cancel", "downgrade", "close my account", "closure"]):
+            return "Cancellation"
+        if any(token in text for token in ["password", "log in", "login", "mfa", "locked", "account access"]):
+            return "Account Access"
+        if any(token in text for token in ["invoice", "charged", "billing", "payment", "plan cost", "pricing"]):
+            return "Billing"
+        return "General Inquiry"
