@@ -1,15 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SupportLens Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
 </head>
-
 <body>
-
     <header class="app-header">
         <div class="header-content">
             <p class="header-kicker">Support Operations</p>
@@ -19,16 +17,9 @@
     </header>
 
     <div class="layout">
-
-        <!-- MAIN DASHBOARD -->
         <div class="main-content">
+            <div class="category-breakdown" id="categoryBreakdown"></div>
 
-            <!-- Category Breakdown -->
-            <div class="category-breakdown" id="categoryBreakdown">
-                <!-- Dynamic category cards -->
-            </div>
-
-            <!-- Filter -->
             <div class="filter-section">
                 <label>Category:</label>
                 <div class="custom-dropdown" id="categoryDropdown">
@@ -44,7 +35,6 @@
                 </div>
             </div>
 
-            <!-- Traces Table -->
             <h2>Traces</h2>
             <table id="traces">
                 <thead>
@@ -58,12 +48,9 @@
                 </thead>
                 <tbody></tbody>
             </table>
-
         </div>
-
     </div>
 
-    <!-- FLOATING CHAT -->
     <div class="chat-panel hidden" id="chatPanel">
         <div class="chat-header">
             <h2>Live Chat</h2>
@@ -83,8 +70,6 @@
 
     <button id="openChatBtn" class="floating-btn">Chat</button>
 
-    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
-
+    <script src="/static/js/dashboard.js"></script>
 </body>
-
 </html>

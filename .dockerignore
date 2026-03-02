@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.db
+instance/
+.venv/
+venv/
+
+# Git and local metadata
+.git/
+.gitignore
+
+# Env and runtime files
+.env
+*.log
+
+# Tooling/test files not needed in runtime image
+tests/
+migrations/
+README.md
+
+# Frontend build artifacts
+node_modules/
